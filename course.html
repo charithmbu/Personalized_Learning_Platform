@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Course Details</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            display: flex;
+            height: 100vh;
+            background-color: #f4f6f9;
+            font-family: 'Arial', sans-serif;
+        }
+
+        #sidebar {
+            width: 250px;
+            background-color: #2c3e50;
+            color: #ecf0f1;
+            padding: 20px;
+            position: fixed;
+            top: 0;
+            bottom: 0;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.2);
+        }
+
+        #sidebar h4 {
+            margin-bottom: 20px;
+            font-size: 1.25rem;
+        }
+
+        #sidebar ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        #sidebar ul li {
+            margin-bottom: 10px;
+        }
+
+        #sidebar ul li a {
+            color: #ecf0f1;
+            text-decoration: none;
+            padding: 10px;
+            display: block;
+            background-color: #34495e;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+        }
+
+        #sidebar ul li.completed a {
+            background-color: #27ae60;
+            color: #fff;
+        }
+
+        #sidebar ul li a:hover {
+            background-color: #1abc9c;
+        }
+
+        #content {
+            flex-grow: 1;
+            padding: 20px;
+            margin-left: 270px;
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        #course-title {
+            font-size: 2rem;
+            margin-bottom: 20px;
+            color: #34495e;
+        }
+
+        #week-title {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            color: #16a085;
+        }
+
+        #progress-bar {
+            height: 20px;
+            background-color: #bdc3c7;
+            border-radius: 5px;
+            margin-top: 20px;
+            overflow: hidden;
+        }
+
+        #progress-bar div {
+            height: 100%;
+            background-color: #27ae60;
+            border-radius: 5px;
+            text-align: center;
+            color: white;
+            line-height: 20px;
+            font-size: 0.875rem;
+        }
+
+        iframe {
+            width: 100%;
+            height: 400px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            border: 1px solid #bdc3c7;
+        }
+
+        .nav-buttons {
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .disabled {
+            pointer-events: none;
+            opacity: 0.6;
+        }
+
+        #mark-completed {
+            margin-top: 10px;
+            display: block;
+            background-color: #16a085;
+            border-color: #16a085;
+        }
+
+        #mark-completed:hover {
+            background-color: #1abc9c;
+            border-color: #1abc9c;
+        }
+
+        #all-courses-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+        }
+
+        .btn-secondary:hover {
+            background-color: #3498db;
+            border-color: #3498db;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="sidebar">
+        <h4>Course Weeks</h4>
+        <ul id="week-list">
+            <!-- Week navigation items will be populated here -->
+        </ul>
+        <div id="progress-bar">
+            <div id="progress">0% Complete</div>
+        </div>
+    </div>
+
+    <div id="content">
+        <a href="courses.html" id="all-courses-btn" class="btn btn-primary">All Courses</a>
+
+        <h2 id="course-title">Course Name</h2>
+        <div id="week-content">
+            <h4 id="week-title">Week Content</h4>
+
+            <div class="nav-buttons">
+                <button id="prev-week" class="btn btn-secondary">Previous</button>
+                <button id="next-week" class="btn btn-secondary">Next</button>
+            </div>
+
+            <iframe id="course-video" src="" frameborder="0" allowfullscreen></iframe>
+            <p id="course-description">Course description will be shown here based on the selected week.</p>
+
+            <button id="mark-completed" class="btn btn-success">Mark as Completed</button>
+        </div>
+    </div>
+
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const courseId = urlParams.get('courseId');
+
+        const courseData = {
+            1: {
+                name: "Introduction to Programming",
+                weeks: [
+                    { title: "Week 1: Introduction to Programming Basics", video: "https://www.youtube.com/embed/zOjov-2OZ0E", description: "Learn the basics of programming." },
+                    { title: "Week 2: Functions and Methods", video: "https://www.youtube.com/embed/89cGQjB5R4M", description: "Learn about functions in programming." },
+                    { title: "Week 3: Loops and Iteration", video: "https://www.youtube.com/embed/94UHCEmprCY", description: "Understand loops and iterations." },
+                    { title: "Week 4: OOP Concepts", video: "https://www.youtube.com/embed/JeznW_7DlB0", description: "Understand Object-Oriented Programming." },
+                    { title: "Week 5: Error Handling", video: "https://www.youtube.com/embed/aAZhlxdDBto", description: "Learn error handling and debugging techniques." }
+                ]
+            },
+            2: {
+                name: "Web Development",
+                weeks: [
+                    { title: "Week 1: HTML Fundamentals", video: "https://www.youtube.com/embed/pQN-pnXPaVg", description: "Learn the fundamentals of HTML." },
+                    { title: "Week 2: CSS Styling", video: "https://www.youtube.com/embed/yfoY53QXEnI", description: "Learn advanced CSS techniques." },
+                    { title: "Week 3: JavaScript Basics", video: "https://www.youtube.com/embed/W6NZfCO5SIk", description: "Introduction to JavaScript." },
+                    { title: "Week 4: Responsive Design", video: "https://www.youtube.com/embed/srvUrASNj0s", description: "Learn about responsive design." },
+                    { title: "Week 5: Advanced JS Concepts", video: "https://www.youtube.com/embed/iLWTnMzWtj4", description: "Understand advanced JavaScript concepts." }
+                ]
+            },  
+            3: {
+        name: "Data Science",
+        weeks: [
+            { title: "Week 1: Data Science Overview", video: "https://www.youtube.com/embed/ua-CiDNNj30", description: "Introduction to data science." },
+            { title: "Week 2: Data Analysis Techniques", video: "https://www.youtube.com/embed/RKRBzjjFZqo", description: "Learn data analysis using Python." },
+            { title: "Week 3: Data Visualization with Matplotlib", video: "https://www.youtube.com/embed/UO98lJQ3QGI", description: "Learn to visualize data with Matplotlib." },
+            { title: "Week 4: Pandas for Data Manipulation", video: "https://www.youtube.com/embed/vmEHCJofslg", description: "Data manipulation with Pandas." },
+            { title: "Week 5: Machine Learning Basics", video: "https://www.youtube.com/embed/GwIo3gDZCVQ", description: "Introduction to machine learning concepts." }
+        ]
+    },
+    4: {
+        name: "Machine Learning",
+        weeks: [
+            { title: "Week 1: What is Machine Learning?", video: "https://www.youtube.com/embed/GwIo3gDZCVQ", description: "Overview of machine learning." },
+            { title: "Week 2: Supervised Learning", video: "https://www.youtube.com/embed/LKlOH8OLLcw", description: "Introduction to supervised learning." },
+            { title: "Week 3: Unsupervised Learning", video: "https://www.youtube.com/embed/D6gtZrsYi6c", description: "Introduction to unsupervised learning." },
+            { title: "Week 4: Reinforcement Learning", video: "https://www.youtube.com/embed/nIgIv4IfJ6s", description: "Learn about reinforcement learning." },
+            { title: "Week 5: Deep Learning Basics", video: "https://www.youtube.com/embed/6M5VXKLf4D4", description: "Introduction to deep learning." }
+        ]
+    },
+    5: {
+        name: "Digital Marketing",
+        weeks: [
+            { title: "Week 1: Introduction to Digital Marketing", video: "https://www.youtube.com/embed/bixR-KIJKYM", description: "Overview of digital marketing strategies." },
+            { title: "Week 2: SEO Fundamentals", video: "https://www.youtube.com/embed/MYE6T_gd7H0", description: "Learn search engine optimization (SEO)." },
+            { title: "Week 3: Social Media Marketing", video: "https://www.youtube.com/embed/KEirK5QWgrA", description: "Marketing strategies for social media." },
+            { title: "Week 4: Email Marketing", video: "https://www.youtube.com/embed/94gHaHKmD4Q", description: "Learn email marketing best practices." },
+            { title: "Week 5: Paid Advertising", video: "https://www.youtube.com/embed/ol0v779BlAA", description: "Introduction to paid digital advertising." }
+        ]
+    },
+    6: {
+        name: "Artificial Intelligence",
+        weeks: [
+            { title: "Week 1: Introduction to AI", video: "https://www.youtube.com/embed/2ePf9rue1Ao", description: "An introduction to artificial intelligence and its applications." },
+            { title: "Week 2: AI Search Algorithms", video: "https://www.youtube.com/embed/CnqMV_wXcBg", description: "Learn about search algorithms in AI." },
+            { title: "Week 3: Neural Networks", video: "https://www.youtube.com/embed/aircAruvnKk", description: "Introduction to neural networks and their applications." },
+            { title: "Week 4: Natural Language Processing", video: "https://www.youtube.com/embed/fLvJ8VdHLA0", description: "Learn the basics of NLP and how AI processes human language." },
+            { title: "Week 5: AI Ethics", video: "https://www.youtube.com/embed/aGwYtUzMQUk", description: "Understand the ethical concerns in AI development." }
+        ]
+    },
+    7: {
+        name: "Data Structures",
+        weeks: [
+            { title: "Week 1: Introduction to Data Structures", video: "https://www.youtube.com/embed/bum_19loj9A", description: "Learn the basics of data structures and their importance." },
+            { title: "Week 2: Arrays and Linked Lists", video: "https://www.youtube.com/embed/WwfhLC16bis", description: "Understand arrays and linked lists." },
+            { title: "Week 3: Stacks and Queues", video: "https://www.youtube.com/embed/A3ZUpyrnCbM", description: "Learn about stack and queue data structures." },
+            { title: "Week 4: Trees and Graphs", video: "https://www.youtube.com/embed/9oTV7fDEaCY", description: "Introduction to tree and graph data structures." },
+            { title: "Week 5: Hashing", video: "https://www.youtube.com/embed/W5q0xgxmRd8", description: "Understand hashing and its applications." }
+        ]
+    },
+    8: {
+        name: "Cloud Computing",
+        weeks: [
+            { title: "Week 1: Introduction to Cloud Computing", video: "https://www.youtube.com/embed/usYySG1nbfI", description: "Overview of cloud computing concepts." },
+            { title: "Week 2: Virtualization in Cloud", video: "https://www.youtube.com/embed/_pPlanX5wQY", description: "Learn about virtualization in cloud environments." },
+            { title: "Week 3: Cloud Service Models", video: "https://www.youtube.com/embed/36zducUX16w", description: "Understand IaaS, PaaS, and SaaS models." },
+            { title: "Week 4: Cloud Security", video: "https://www.youtube.com/embed/jI8IKpjiCSM", description: "Learn about security in cloud computing." },
+            { title: "Week 5: Cloud Deployment Models", video: "https://www.youtube.com/embed/XlNR7myQydI", description: "Understand the different cloud deployment models." }
+        ]
+    },
+    9: {
+        name: "Deep Learning",
+        weeks: [
+            { title: "Week 1: Introduction to Deep Learning", video: "https://www.youtube.com/embed/aircAruvnKk", description: "Introduction to deep learning concepts and architectures." },
+            { title: "Week 2: Convolutional Neural Networks (CNNs)", video: "https://www.youtube.com/embed/2-Ol7ZB0MmU", description: "Learn about CNNs and their applications." },
+            { title: "Week 3: Recurrent Neural Networks (RNNs)", video: "https://www.youtube.com/embed/UNmqTiOnRfg", description: "Understand RNNs and their use in sequence modeling." },
+            { title: "Week 4: Generative Models", video: "https://www.youtube.com/embed/8L11aMN5KY8", description: "Learn about generative models like GANs and VAEs." },
+            { title: "Week 5: Deep Learning in Real-World Applications", video: "https://www.youtube.com/embed/1LxmmF88fDw", description: "Explore real-world applications of deep learning." }
+        ]
+    },
+    10: {
+        name: "Neural Networks",
+        weeks: [
+            { title: "Week 1: Introduction to Neural Networks", video: "https://www.youtube.com/embed/aircAruvnKk", description: "Learn the fundamentals of neural networks." },
+            { title: "Week 2: Multilayer Perceptrons (MLP)", video: "https://www.youtube.com/embed/5u0jaA3qAGk", description: "Understand MLPs and their architecture." },
+            { title: "Week 3: Backpropagation", video: "https://www.youtube.com/embed/Ilg3gGewQ5U&t=392s", description: "Learn about backpropagation and gradient descent." },
+            { title: "Week 4: Optimization Techniques", video: "https://www.youtube.com/embed/mdKjMPmcWjY", description: "Explore optimization techniques for training neural networks." },
+            { title: "Week 5: Neural Networks in Practice", video: "https://www.youtube.com/embed/cAkMcPfY_Ns", description: "Implement neural networks for real-world tasks." }
+        ]
+    },
+    11: {
+        name: "Cyber Security",
+        weeks: [
+            { title: "Week 1: Introduction to Cyber Security", video: "https://www.youtube.com/embed/z5nc9MDbvkw", description: "Learn the fundamentals of cybersecurity." },
+            { title: "Week 2: Network Security Basics", video: "https://www.youtube.com/embed/NQ1cvwEvh44", description: "Understand how to secure networks." },
+            { title: "Week 3: Cryptography", video: "https://www.youtube.com/embed/C7vmouDOJYM", description: "Introduction to cryptographic techniques." },
+            { title: "Week 4: Ethical Hacking", video: "https://www.youtube.com/embed/XLvPpirlmEs", description: "Learn the basics of ethical hacking and penetration testing." },
+            { title: "Week 5: Cyber Threats and Attacks", video: "https://www.youtube.com/embed/wKFOXuWoqmM", description: "Understand common cyber threats and how to defend against them." }
+        ]
+    },
+    12: {
+        name: "Quantum Computing",
+        weeks: [
+            { title: "Week 1: Introduction to Quantum Computing", video: "https://www.youtube.com/embed/X8MZWCGgIb8", description: "Learn the basics of quantum computing and its principles." },
+            { title: "Week 2: Quantum Bits (Qubits)", video: "https://www.youtube.com/embed/90za6mazNps", description: "Understand qubits and their role in quantum computing." },
+            { title: "Week 3: Quantum Algorithms", video: "https://www.youtube.com/embed/7MdEHsRZxvo", description: "Explore popular quantum algorithms like Shor's and Grover's." },
+            { title: "Week 4: Quantum Hardware", video: "https://www.youtube.com/embed/0xMX8mSeIKw", description: "Learn about quantum hardware and quantum circuits." },
+            { title: "Week 5: Future of Quantum Computing", video: "https://www.youtube.com/embed/lum6rdKr4To", description: "Understand the future impact of quantum computing." }
+        ]
+    },
+    13: {
+        name: "Health and Technology",
+        weeks: [
+            { title: "Week 1: Introduction to Health Technology", video: "https://www.youtube.com/embed/4iSElJn4490", description: "Explore the intersection of health and technology." },
+            { title: "Week 2: Telemedicine", video: "https://www.youtube.com/embed/UsxA2phUHfA", description: "Learn about the advancements in telemedicine." },
+            { title: "Week 3: Health Data Analytics", video: "https://www.youtube.com/embed/qcQoBXa0uZ8", description: "Understand how data analytics is revolutionizing healthcare." },
+            { title: "Week 4: Wearable Health Devices", video: "https://www.youtube.com/embed/knEzQPGEaGY", description: "Learn about the impact of wearable technology on health." },
+            { title: "Week 5: AI in Healthcare", video: "https://www.youtube.com/embed/j6EB9HO6acE", description: "Discover how AI is transforming healthcare." }
+        ]
+    },
+    14: {
+        name: "Internet of Things (IoT)",
+        weeks: [
+            { title: "Week 1: Introduction to IoT", video: "https://www.youtube.com/embed/LlhmzVL5bm8", description: "Overview of IoT concepts and applications." },
+            { title: "Week 2: IoT Devices and Sensors", video: "https://www.youtube.com/embed/rhq0JcZsvYo", description: "Learn about IoT devices and sensor technologies." },
+            { title: "Week 3: IoT Communication Protocols", video: "https://www.youtube.com/embed/yVxwvrs7354", description: "Understand communication protocols in IoT systems." },
+            { title: "Week 4: IoT Security", video: "https://www.youtube.com/embed/pGtnC1jKpMg", description: "Learn about IoT security and data protection." },
+            { title: "Week 5: IoT in Smart Homes", video: "https://www.youtube.com/embed/EQnLrDvfeLU", description: "Explore IoT applications in smart home systems." }
+        ]
+    },
+    15: {
+        name: "Blockchain and Cryptocurrency",
+        weeks: [
+            { title: "Week 1: Introduction to Blockchain", video: "https://www.youtube.com/embed/yubzJw0uiE4", description: "Learn what blockchain technology is and how it works." },
+            { title: "Week 2: Cryptocurrencies and Bitcoin", video: "https://www.youtube.com/embed/SSo_EIwHSd4", description: "Overview of cryptocurrencies and the Bitcoin network." },
+            { title: "Week 3: Ethereum and Smart Contracts", video: "https://www.youtube.com/embed/pYasYyjByKI", description: "Learn about Ethereum and how smart contracts work." },
+            { title: "Week 4: Blockchain in Business", video: "https://www.youtube.com/embed/Pl8OlkkwRpc", description: "Understand blockchain applications in business and finance." },
+            { title: "Week 5: Future of Blockchain", video: "https://www.youtube.com/embed/uxSnT9D-WQo", description: "Explore the future of blockchain technology." }
+        ]
+    }
+};
+
+        const course = courseData[courseId] || { name: "Unknown Course", weeks: [] };
+        let currentWeekIndex = 0;
+
+        document.getElementById('course-title').textContent = course.name;
+
+        const weekList = document.getElementById('week-list');
+        const weekTitle = document.getElementById('week-title');
+        const courseVideo = document.getElementById('course-video');
+        const courseDescription = document.getElementById('course-description');
+        const progressBar = document.getElementById('progress');
+        const markCompletedButton = document.getElementById('mark-completed');
+
+        let completedWeeks = JSON.parse(localStorage.getItem(`completedWeeks-${courseId}`)) || [];
+
+        course.weeks.forEach((week, index) => {
+            const li = document.createElement('li');
+            li.innerHTML = `<a href="#" data-week="${index}">${week.title}</a>`;
+            li.setAttribute('data-week-index', index);
+            if (completedWeeks.includes(index)) {
+                li.classList.add('completed');
+            }
+            weekList.appendChild(li);
+
+            li.addEventListener('click', function () {
+                loadWeekContent(index);
+            });
+        });
+
+        function loadWeekContent(weekIndex) {
+            currentWeekIndex = weekIndex;
+            const week = course.weeks[weekIndex];
+            weekTitle.textContent = week.title;
+            courseVideo.src = week.video;
+            courseDescription.textContent = week.description;
+            updateButtons();
+        }
+
+        function updateButtons() {
+            document.getElementById('prev-week').classList.toggle('disabled', currentWeekIndex === 0);
+            document.getElementById('next-week').classList.toggle('disabled', currentWeekIndex === course.weeks.length - 1);
+        }
+
+        document.getElementById('prev-week').addEventListener('click', function () {
+            if (currentWeekIndex > 0) {
+                loadWeekContent(currentWeekIndex - 1);
+            }
+        });
+
+        document.getElementById('next-week').addEventListener('click', function () {
+            if (currentWeekIndex < course.weeks.length - 1) {
+                loadWeekContent(currentWeekIndex + 1);
+            }
+        });
+
+        markCompletedButton.addEventListener('click', function () {
+            const currentLi = weekList.querySelector(`li[data-week-index="${currentWeekIndex}"]`);
+            currentLi.classList.add('completed');
+            if (!completedWeeks.includes(currentWeekIndex)) {
+                completedWeeks.push(currentWeekIndex);
+                localStorage.setItem(`completedWeeks-${courseId}`, JSON.stringify(completedWeeks));
+            }
+            updateProgress();
+        });
+
+        function updateProgress() {
+            const progress = (completedWeeks.length / course.weeks.length) * 100;
+            progressBar.style.width = `${progress}%`;
+            progressBar.textContent = `${Math.floor(progress)}% Complete`;
+        }
+
+        loadWeekContent(0);
+        updateProgress();
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Assessment Quizzes</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f4f4f4;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h2 {
+            margin-bottom: 10px;
+        }
+        .week {
+            margin: 20px 0;
+        }
+        .start-quiz-button {
+            display: block;
+            margin-top: 10px;
+            padding: 10px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .start-quiz-button:hover {
+            background-color: #218838;
+        }
+    </style>
+</head>
+<body>
+    <h1>Assessment Quizzes</h1>
+    <div>
+        <label for="subject-select">Choose a subject:</label>
+        <select id="subject-select" onchange="displayWeeks()">
+            <option value="">--Select a Subject--</option>
+            <option value="programming">Programming</option>
+            <option value="webDevelopment">Web Development</option>
+            <option value="dataScience">Data Science</option>
+            <option value="machineLearning">Machine Learning</option>
+            <option value="digitalMarketing">Digital Marketing</option>
+            <option value="artificialIntelligence">Artificial Intelligence</option>
+            <option value="dataStructures">Data Structures</option>
+            <option value="cloudComputing">Cloud Computing</option>
+            <option value="deepLearning">Deep Learning</option>
+            <option value="neuralNetworks">Neural Networks</option>
+            <option value="cyberSecurity">Cyber Security</option>
+            <option value="quantumComputing">Quantum Computing</option>
+            <option value="healthandTechnology">Health and Technology</option>
+            <option value="internetofThings">Internet Of Things</option>
+            <option value="blockchainandCryptocurrency">Block Chain and Cryptocurrency</option>
+            
+        </select>
+    </div>
+    <div id="weeks-container"></div>
+
+    <script>
+        const questionBank = {
+            programming: {
+                week1: "Introduction to Programming Basics",
+                week2: "Functions and Methods",
+                week3: "Loops and Iteration",
+                week4: "OOP Concepts",
+                week5: "Error Handling"
+            },
+            webDevelopment: {
+                week1: "HTML Fundamentals",
+                week2: "CSS Styling",
+                week3: "JavaScript Basics",
+                week4: "Responsive Design",
+                week5: "Advanced JS Concepts"
+            },
+            dataScience: {
+                week1: "Data Science Overview",
+                week2: "Data Analysis Techniques",
+                week3: "Data Visualization with Matplotlib",
+                week4: "Pandas for Data Manipulation",
+                week5: "Machine Learning Basics"
+            },
+            machineLearning: {
+                week1: "What is Machine Learning?",
+                week2: "Supervised Learning",
+                week3: "Unsupervised Learning",
+                week4: "Reinforcement Learning",
+                week5: "Deep Learning Basics"
+            },
+            digitalMarketing: {
+                week1: "Introduction to Digital Marketing",
+                week2: "SEO Fundamentals",
+                week3: "Social Media Marketing",
+                week4: "Email Marketing",
+                week5: "Paid Advertising"
+            },
+            artificialIntelligence: {
+                week1: "Introduction to AI",
+                week2: "AI Search Algorithms",
+                week3: "Neural Networks",
+                week4: "Natural Language Processing",
+                week5: "AI Ethics"
+            },
+            dataStructures: {
+                week1: "Introduction to Data Structures",
+                week2: "Arrays and Linked Lists",
+                week3: "Stacks and Queues",
+                week4: "Trees and Graphs",
+                week5: "Hashing"
+            },
+            cloudComputing: {
+                week1: "Introduction to Cloud Computing",
+                week2: "Virtualization in Cloud",
+                week3: "Cloud Service Models",
+                week4: "Cloud Security",
+                week5: "Cloud Deployment Models"
+            },
+            deepLearning: {
+                week1: "Introduction to Deep Learning",
+                week2: "Convolutional Neural Networks (CNNs)",
+                week3: "Recurrent Neural Networks (RNNs)",
+                week4: "Generative Models",
+                week5: "Deep Learning in Real-World Applications"
+            },
+            neuralNetworks: {
+                week1: "Introduction to Neural Networks",
+                week2: "Multilayer Perceptrons (MLP)",
+                week3: "Backpropagation",
+                week4: "Optimization Techniques",
+                week5: "Neural Networks in Practice"
+            },
+            cyberSecurity: {
+                week1: "Introduction to Cyber Security",
+                week2: "Network Security Basics",
+                week3: "Cryptography",
+                week4: "Ethical Hacking",
+                week5: "Cyber Threats and Attacks"
+            },
+            quantumComputing: {
+                week1: "Introduction to Quantum Computing",
+                week2: "Quantum Bits (Qubits)",
+                week3: "Quantum Algorithms",
+                week4: "Quantum Hardware",
+                week5: "Future of Quantum Computing"
+            },
+            healthandTechnology: {
+                week1: "Introduction to Health Technology",
+                week2: "Telemedicine",
+                week3: "Health Data Analytics",
+                week4: "Wearable Health Devices",
+                week5: "AI in Healthcare"
+            },
+            internetofThings: {
+                week1: "Introduction to IoT",
+                week2: "IoT Devices and Sensors",
+                week3: "IoT Communication Protocols",
+                week4: "IoT Security",
+                week5: "IoT in Smart Homes"
+            },
+            blockchainandCryptocurrency: {
+                week1: "Introduction to Blockchain",
+                week2: "Cryptocurrencies and Bitcoin",
+                week3: "Ethereum and Smart Contracts",
+                week4: "Blockchain in Business",
+                week5: "Future of Blockchain"
+            },
+            
+
+
+        };
+
+        function displayWeeks() {
+    const subjectSelect = document.getElementById('subject-select');
+    const selectedSubject = subjectSelect.value;
+    const weeksContainer = document.getElementById('weeks-container');
+    weeksContainer.innerHTML = ''; // Clear previous weeks
+
+    if (selectedSubject) {
+        const weeks = Object.keys(questionBank[selectedSubject]);
+        weeks.forEach(week => {
+            const completionKey = `${selectedSubject}_${week}_completed`;
+            const isCompleted = JSON.parse(localStorage.getItem(completionKey));
+
+            const weekDiv = document.createElement('div');
+            weekDiv.className = 'week';
+            weekDiv.innerHTML = `
+                <h2>${questionBank[selectedSubject][week]}
+                    ${isCompleted ? '<span style="color: green;">✔</span>' : ''}
+                </h2>
+                <button class="start-quiz-button" onclick="startQuiz('${selectedSubject}', '${week}')">Start Quiz</button>
+            `;
+            weeksContainer.appendChild(weekDiv);
+        });
+    }
+}
+
+
+        function startQuiz(subject, week) {
+            // Redirect to the quizzes page with the selected subject and week
+            window.location.href = `quizzes.html?subject=${subject}&week=${week.replace("week", "") - 1}`;
+        }
+
+
+    </script>
+</body>
+</html>

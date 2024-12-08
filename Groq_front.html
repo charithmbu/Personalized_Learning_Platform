@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Groq Chat</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Layout container */
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            height: 90vh;
+            display: flex;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            background-color: white;
+            overflow: hidden;
+        }
+
+        /* Chat history sidebar */
+        .chat-history {
+            width: 30%;
+            background-color: #333;
+            color: white;
+            padding: 20px;
+            overflow-y: auto;
+            position: relative; /* Added to position the New Chat button */
+        }
+
+        /* Chat prompt and responses area */
+        .chat-box {
+            width: 70%;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 20px;
+        }
+
+        /* Response box for displaying chat history */
+        #response-box {
+            flex-grow: 1;
+            margin-bottom: 20px;
+            overflow-y: auto;
+            padding-right: 10px;
+            background-color: #f0f0f0;
+            border-radius: 8px;
+            padding: 10px; /* Added padding for better spacing */
+        }
+
+        .message {
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 8px;
+            word-wrap: break-word; /* Ensures long messages wrap */
+        }
+
+        .message.user {
+            font-weight: bold;
+            color: #007bff;
+            background-color: #e6f7ff;
+        }
+
+        .message.bot {
+            color: #555;
+            background-color: #eaeaea;
+        }
+
+        /* Input form at the bottom of the chat box */
+        #ask-form {
+            display: flex;
+            justify-content: center;
+            padding: 10px 0;
+            border-top: 1px solid #ccc;
+        }
+
+        #user-input {
+            width: 80%;
+            padding: 10px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+            margin-right: 10px;
+        }
+
+        button[type="submit"] {
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        button[type="submit"]:hover {
+            background-color: #0056b3;
+        }
+
+        /* Scrollbar styling for chat history */
+        .chat-history, #response-box {
+            scrollbar-width: thin;
+            scrollbar-color: #888 #333;
+        }
+
+        .chat-history::-webkit-scrollbar, #response-box::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        .chat-history::-webkit-scrollbar-thumb, #response-box::-webkit-scrollbar-thumb {
+            background-color: #888;
+            border-radius: 10px;
+        }
+
+        /* New Chat button styles */
+        #new-chat {
+            position: absolute; /* Position the button absolutely */
+            top: 20px;
+            right: 20px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 5px 10px;
+            cursor: pointer;
+        }
+
+        #new-chat:hover {
+            background-color: #218838;
+        }
+
+        /* Clear history button styles */
+        #clear-history {
+            background-color: red;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 5px 10px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+
+        <!-- Sidebar showing user's prompt history -->
+        <div class="chat-history" id="chat-history">
+            <h2>History</h2>
+            <button id="clear-history">Clear</button>
+            <button id="new-chat">New Chat</button>
+            <div id="history-content">
+                <!-- This will get filled with user's prompt history -->
+            </div>
+        </div>
+
+        <!-- Chat box for interacting with Groq -->
+        <div class="chat-box">
+            <div id="response-box">
+                <!-- Responses from Groq will appear here -->
+            </div>
+
+            <!-- Form for input prompt -->
+            <form id="ask-form">
+                <input type="text" id="user-input" name="user_input" placeholder="Type your question..." required>
+                <button type="submit">Send</button>
+            </form>
+        </div>
+
+    </div>
+
+    <script>
+        $(document).ready(function() {
+            // Function to load chat history from localStorage
+            function loadChatHistory() {
+                const chatHistory = JSON.parse(localStorage.getItem('chatHistory')) || [];
+                chatHistory.forEach(item => {
+                    $('#history-content').append(`<div class="message user" data-bot-response="${item.bot}">You: ${item.user}</div>`);
+                    $('#response-box').append(`<div class="message user">You: ${item.user}</div>`);
+                    $('#response-box').append(`<div class="message bot">Groq: <p>${item.bot}</p></div>`);
+                });
+
+                // Show the clear button if there's history
+                if (chatHistory.length > 0) {
+                    $('#clear-history').show();
+                } else {
+                    $('#clear-history').hide();
+                }
+            }
+
+            // Load chat history when the page loads
+            loadChatHistory();
+
+            // Clear history button functionality with confirmation
+            $('#clear-history').on('click', function() {
+                if (confirm("Are you sure you want to clear the history?")) {
+                    localStorage.removeItem('chatHistory'); // Clear chat history from localStorage
+                    $('#history-content').empty(); // Clear displayed chat history
+                    $('#response-box').empty(); // Clear response box
+                    $('#clear-history').hide(); // Hide clear button
+                }
+            });
+
+            // New Chat button functionality
+            $('#new-chat').on('click', function() {
+                $('#response-box').empty(); // Clear displayed responses
+            });
+
+            // Click on history item to display corresponding bot response
+            $(document).on('click', '.message.user', function() {
+                const botResponse = $(this).data('bot-response');
+                $('#response-box').empty(); // Clear previous responses
+                $('#response-box').append(`<div class="message bot">Groq: <p>${botResponse}</p></div>`); // Show selected bot response
+            });
+
+            $('#ask-form').on('submit', function(e) {
+                e.preventDefault();
+                const userInput = $('#user-input').val();
+                
+                // Append user input to chat history and response box
+                $('#history-content').append(`<div class="message user" data-bot-response="">You: ${userInput}</div>`);
+                $('#response-box').append(`<div class="message user">You: ${userInput}</div>`);
+
+                $('#user-input').val('');  // Clear the input field
+
+                $.ajax({
+                    type: 'POST',
+                    url: 'http://127.0.0.1:5000/ask',  // Adjust the URL to your backend
+                    data: { user_input: userInput },
+                    success: function(response) {
+                        let botResponse = '';
+
+                        if (response.response) {
+                            botResponse = response.response
+                                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') // Replace **text** with <strong>text</strong>
+                                .replace(/\n/g, '</p><p>'); // Replace newline with paragraph breaks
+                            $('#response-box').append(`<div class="message bot">Groq: <p>${botResponse}</p></div>`);
+                        } else if (response.error) {
+                            botResponse = `Error: ${response.error}`;
+                            $('#response-box').append(`<div class="message bot">${botResponse}</div>`);
+                        }
+
+                        // Save to localStorage
+                        const chatHistory = JSON.parse(localStorage.getItem('chatHistory')) || [];
+                        chatHistory.push({ user: userInput, bot: botResponse });
+                        localStorage.setItem('chatHistory', JSON.stringify(chatHistory));
+
+                        // Show clear button if there's history
+                        if (chatHistory.length > 0) {
+                            $('#clear-history').show();
+                        }
+                    },
+                    error: function() {
+                        $('#response-box').append('<div class="message bot">Error: Could not get a response.</div>');
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

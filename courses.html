@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>All Courses</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        a{
+            text-decoration: none;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #e9ecef; /* Light grey background */
+            padding: 20px;
+        }
+
+        h1 {
+            color: #007bff; /* Bootstrap primary color */
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .course-card {
+            border: none;
+            border-radius: 10px;
+            overflow: hidden;
+            transition: transform 0.3s, box-shadow 0.3s;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            background: linear-gradient(145deg, #ffffff, #f7f7f7); /* Subtle gradient */
+        }
+
+        .course-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .course-thumbnail {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+
+        .course-title {
+            font-size: 20px;
+            font-weight: bold;
+            color: #343a40; /* Dark grey for title */
+        }
+
+        .course-description {
+            color: #6c757d; /* Bootstrap secondary color */
+            margin-top: 5px;
+        }
+
+        .row {
+            margin: 0;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .course-card {
+                margin-bottom: 15px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <h1>All Courses</h1>
+        <div class="row" id="course-list">
+            <!-- Course items will be populated here -->
+        </div>
+    </div>
+
+    <script>
+        // Define your course data
+        const courses = [
+            { id: 1, name: "Introduction to Programming", description: "Learn the basics of programming with Python.", thumbnail: "https://bizanosa.com/wp-content/uploads/2017/11/29-Introduction-to-Programming-for-beginners.jpg" },
+            { id: 2, name: "Web Development", description: "Build responsive websites on your own.", thumbnail: "https://tse2.mm.bing.net/th?id=OIP.qyHgF2j7tmHsEF3u3qL_KwHaDJ&pid=Api&P=0&h=180" },
+            { id: 3, name: "Data Science", description: "Analyze and visualize data using Python and R.", thumbnail: "https://miro.medium.com/v2/resize:fit:1200/1*f-0MUEuaILWShigxdiqkjw.jpeg" },
+            { id: 4, name: "Machine Learning", description: "Understand the principles of machine learning and AI.", thumbnail: "https://thumbor.forbes.com/thumbor/fit-in/1200x0/filters:format(jpg)/https://specials-images.forbesimg.com/dam/imageserve/1129869424/0x0.jpg%3Ffit%3Dscale" },
+            { id: 5, name: "Digital Marketing", description: "Learn digital marketing strategies and tools.", thumbnail: "https://freelancetopic.com/wp-content/uploads/2018/07/Digital-Marketing-Freelance-Topic.jpg" },
+            { id: 6, name: "Artificial Intelligence", description: "Harness the power of AI.", thumbnail: "http://www.marktechpost.com/wp-content/uploads/2023/04/artificial-intelligence-new-technology-science-futuristic-abstract-human-brain-ai-technology-cpu-central-processor-unit-chipset-big-data-machine-learning-cyber-mind-domination-generative-ai-scaled.jpg" },
+            { id: 7, name: "Data Structures", description: "DSA is now easy with PLP.", thumbnail: "https://www.designveloper.com/wp-content/uploads/2020/08/image8.png" },
+            { id: 8, name: "Cloud Computing", description: "Build your own Cloud Technology.", thumbnail: "https://www.ingenious.co.uk/wp-content/uploads/2023/08/What-is-Cloud-Computing.jpeg" },
+            { id: 9, name: "Deep Learning", description: "Train a Network With Deep Learning.", thumbnail: "https://www.robot-magazine.fr/wp-content/uploads/2021/06/deep-learning-vs-machine-learning.jpg" },
+            { id: 10, name: "Neural Networks", description: "Train a model with the Neural Networks.", thumbnail: "https://gadictos.com/wp-content/uploads/2019/05/1_1mpE6fsq5LNxH31xeTWi5w-scaled.jpeg" },
+            { id: 11, name: "Cyber Security", description: "Secure the people from threat actors.", thumbnail: "https://cioafrica.co/wp-content/uploads/2024/01/cyber-security.jpeg" },
+            { id: 12, name: "Quantum Computing", description: "Build your own super computer.", thumbnail: "https://www.raconteur.net/wp-content/uploads/2022/09/Quantum-computing-iStock-1346925522.jpg" },
+            { id: 13, name: "Health and Technology", description: "Health is Wealth.", thumbnail: "http://www.trackactive.co/wp-content/uploads/2017/09/AdobeStock_146868987-small.jpg" },
+            { id: 14, name: "Internet of Things(IOT)", description: "Control your home appliances with sensors.", thumbnail: "https://static.vecteezy.com/system/resources/previews/012/742/295/non_2x/abstract-internet-of-things-concept-city-5g-iot-internet-of-things-communication-network-innovation-technology-concept-icons-connect-wireless-devices-and-networking-innovation-technology-vector.jpg" },
+            { id: 15, name: "Block Chain and Crypto Currency", description: "Do you know how much it costs a Bit Coin$ ?.", thumbnail: "https://arc10.io/wp-content/uploads/2023/03/9935562c-2912-424e-b370-8b5855013ee6.jpeg" },
+        ];
+
+        // Function to populate the course list
+        function populateCourses() {
+            const courseList = document.getElementById("course-list");
+
+            courses.forEach(course => {
+                const col = document.createElement("div");
+                col.className = "col-md-4";
+
+                col.innerHTML = `
+                    <div class="course-card">
+                        <a href="course.html?courseId=${course.id}" target="_blank">
+                            <img src="${course.thumbnail}" alt="${course.name}" class="course-thumbnail">
+                            <div class="p-3">
+                                <div class="course-title">${course.name}</div>
+                                <div class="course-description">${course.description}</div>
+                            </div>
+                        </a>
+                    </div>
+                `;
+                courseList.appendChild(col);
+            });
+        }
+
+        // Call the function to populate the courses when the page loads
+        document.addEventListener("DOMContentLoaded", populateCourses);
+    </script>
+
+</body>
+
+</html>
